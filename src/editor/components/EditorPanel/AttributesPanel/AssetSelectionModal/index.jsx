@@ -4,7 +4,6 @@ import { translate } from 'react-i18next';
 import { connect } from 'react-redux';
 
 import classNames from 'classnames';
-import _isEmpty from 'lodash/isEmpty';
 
 import Dropdown from 'ui-elements/Dropdown';
 import Modal from 'ui-elements/Modal';
@@ -20,14 +19,13 @@ import './styles.scss';
 function getStateFromProps(nextProps, prevProps = {}) {
   const {
     assets,
-    assetLibraryIds,
     libraries,
     recentUsedAssets,
     selectedAssetId,
   } = nextProps;
 
   const state = {
-    dropdownListItems: assetLibraryIds ? assetLibraryIds.map(id => libraries[id].name) : [],
+    dropdownListItems: libraries ? libraries.map(l => (l.name)) : [],
   };
 
   if (nextProps.open && !prevProps.open) {
@@ -35,10 +33,9 @@ function getStateFromProps(nextProps, prevProps = {}) {
       assets.find(a => a.id === selectedAssetId) :
       recentUsedAssets[0]
     );
-
-    if (assetLibraryIds.length > 0 && !_isEmpty(libraries)) {
+    if (libraries && libraries.length > 0) {
       state.selectedLibraryIndex = (asset ?
-        assetLibraryIds.findIndex(id => id === asset.libraryId) :
+        libraries.findIndex(l => l.id === asset.libraryId) :
         0 // select the first library by default for new story
       );
     }
@@ -48,7 +45,6 @@ function getStateFromProps(nextProps, prevProps = {}) {
 
 @connect(store => ({
   ...store.editorPanel.AttributesPanel.AssetSelectionModal,
-  libraries: store.libraries.dict,
 }))
 @translate(['AssetSelectionModal'])
 export default class AssetSelectionModal extends React.Component {
@@ -57,8 +53,7 @@ export default class AssetSelectionModal extends React.Component {
     dispatch: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired,
     assets: PropTypes.array,
-    assetLibraryIds: PropTypes.object,
-    libraries: PropTypes.object,
+    libraries: PropTypes.array,
     open: PropTypes.bool,
     recentUsedAssets: PropTypes.array,
     selectedAssetId: PropTypes.number,
@@ -83,9 +78,9 @@ export default class AssetSelectionModal extends React.Component {
 
   handleDropdownSelect = (selectedIndexes) => {
     if (selectedIndexes.length > 0) {
-      const { assetLibraryIds } = this.props;
+      const { libraries } = this.props;
       const index = selectedIndexes[0];
-      if (assetLibraryIds && index === assetLibraryIds.length) {
+      if (libraries && index === libraries.length) {
         this.handleCloseRequest();
         window.location.href = '/store';
       } else {
@@ -106,7 +101,6 @@ export default class AssetSelectionModal extends React.Component {
   render() {
     const {
       assets,
-      assetLibraryIds,
       libraries,
       open,
       recentUsedAssets,
@@ -122,7 +116,7 @@ export default class AssetSelectionModal extends React.Component {
 
     let filteredAssets = [...assets];
     if (libraries && filteredAssets.length > 0 && selectedLibraryIndex >= 0) {
-      const selectedLibrary = libraries[assetLibraryIds[selectedLibraryIndex]];
+      const selectedLibrary = libraries[selectedLibraryIndex];
       filteredAssets = assets.filter(
         item => item.libraryId === selectedLibrary.id
       );

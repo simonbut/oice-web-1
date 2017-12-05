@@ -44,6 +44,7 @@ function getStateFromProps(props) {
 @connect((store, ownProps) => {
   const {
     assets,
+    libraries,
     editorPanel,
   } = store;
   const macroName = _get(ownProps, 'block.macroName');
@@ -51,21 +52,18 @@ function getStateFromProps(props) {
   let assetList = [];
   let assetType;
   let recentUsedAssets = [];
-  let libraryIdSet = [];
   switch (macroName) {
     case 'bg':
       assetDict = assets.bgImageDict;
       assetList = assets.bgImageList;
       assetType = RecentUsed.Constants.BG;
       recentUsedAssets = editorPanel.RecentUsed[assetType];
-      libraryIdSet = assets.bgImageLibraryIdSet;
       break;
     case 'item':
       assetDict = assets.itemImageDict;
       assetList = assets.itemImageList;
       assetType = RecentUsed.Constants.ITEM;
       recentUsedAssets = editorPanel.RecentUsed[assetType];
-      libraryIdSet = assets.itemImageLibraryIdSet;
       break;
     default:
       break;
@@ -74,7 +72,7 @@ function getStateFromProps(props) {
     assetDict,
     assetList,
     assetType,
-    libraryIdSet,
+    libraries: libraries.list,
     recentUsedAssets,
   };
 })
@@ -86,7 +84,7 @@ export default class ImageForm extends React.Component {
     assetList: PropTypes.array,
     assetType: PropTypes.string,
     block: PropTypes.object,
-    libraryIdSet: PropTypes.object,
+    libraries: PropTypes.array,
     recentUsedAssets: PropTypes.array,
   }
 
@@ -107,7 +105,7 @@ export default class ImageForm extends React.Component {
       assetList,
       block,
       dispatch,
-      libraryIdSet,
+      libraries,
       recentUsedAssets,
       t,
     } = this.props;
@@ -121,7 +119,7 @@ export default class ImageForm extends React.Component {
 
     dispatch(AssetSelectionModal.Actions.open({
       assets: assetList,
-      assetLibraryIds: [...libraryIdSet],
+      libraries,
       selectedAssetId,
       title,
       recentUsedAssets,

@@ -1,11 +1,8 @@
 import { handleAction, handleActions } from 'redux-actions';
 
-import _keyBy from 'lodash/keyBy';
-
 
 const initialState = {
   list: [],
-  dict: {},
 };
 
 export default handleActions({
@@ -19,7 +16,24 @@ export default handleActions({
     return ({
       ...state,
       list,
-      dict: _keyBy(list, item => item.id),
+    });
+  },
+  ADDED_LIBRARY: (state, { payload }) => {
+    const copyList = [...state.list];
+    copyList.push(payload); // push will not change list itself
+    return ({
+      ...state,
+      list: copyList,
+    });
+  },
+  DELETED_LIBRARY: (state, { payload }) => {
+    const libraryId = payload;
+    const copyList = [...state.list];
+    const index = copyList.findIndex(o => o.id === libraryId);
+    copyList.splice(index, 1);
+    return ({
+      ...state,
+      list: copyList,
     });
   },
 }, initialState);

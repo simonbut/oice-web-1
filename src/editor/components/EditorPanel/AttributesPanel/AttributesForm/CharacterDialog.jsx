@@ -104,20 +104,20 @@ function getStateFromProps(props) {
 
 @translate(['editor', 'assetsManagement', 'general'])
 @connect((store) => {
-  const { editorPanel, characters, stories } = store;
-  const { characterDictionary, characterList, characterLibraryIdSet } = characters;
+  const { editorPanel, libraries, stories } = store;
+  const { characterDictionary, characterList } = stories;
   return {
-    characterList,
     characterDictionary,
-    characterLibraryIdSet,
+    characterList,
     storyId: _get(stories, 'selected.id'),
+    libraries: libraries.list,
     recentUsedCharacters: editorPanel.RecentUsed[RecentUsed.Constants.CHARACTER],
   };
 })
 export default class CharacterDialogForm extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    characterLibraryIdSet: PropTypes.object.isRequired,
+    libraries: PropTypes.array.isRequired,
     t: PropTypes.func.isRequired,
     attributesDefList: PropTypes.array,
     block: PropTypes.any,
@@ -192,8 +192,8 @@ export default class CharacterDialogForm extends React.Component {
     const {
       characterDictionary,
       characterList,
-      characterLibraryIdSet,
       dispatch,
+      libraries,
       recentUsedCharacters,
       t,
     } = this.props;
@@ -201,7 +201,7 @@ export default class CharacterDialogForm extends React.Component {
 
     dispatch(AssetSelectionModal.Actions.open({
       assets: characterList,
-      assetLibraryIds: [...characterLibraryIdSet],
+      libraries,
       selectedAssetId: selectedCharacterId,
       recentUsedAssets: recentUsedCharacters,
       title: t('characterSelectionModal.title'),

@@ -25,7 +25,6 @@ const initialState = {
   // audio
   selectedAudio: null,
   audios: [],
-  assetLibraryIds: [],
   onSelected: null,
   recentUsedAsset: null,
 };
@@ -34,7 +33,6 @@ export default handleActions({
   [Actions.openAudioSelectionModal]: (state, { payload }) => ({
     ...state,
     audios: payload.audios || [],
-    assetLibraryIds: payload.assetLibraryIds || [],
     className: payload.className || null,
     open: true,
     recentUsedAsset: payload.recentUsedAsset || null,

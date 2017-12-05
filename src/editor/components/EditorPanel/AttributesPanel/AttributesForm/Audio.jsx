@@ -24,39 +24,33 @@ import { openAudioSelectionModal } from 'editor/actions/modal';
 
 const { SE, BGM } = RecentUsed.Constants;
 
-function getAssetType(block) {
-  return block.macroName;
-}
-
-function isBGM(block) {
-  return getAssetType(block) === BGM;
-}
-
 @translate(['editor', 'macro', 'attributesPanel'])
-@connect(({ assets, editorPanel }, ownProps) => {
-  if (isBGM(ownProps.block)) {
-    return {
-      assets: assets.BGMs,
-      recentUsedAssets: editorPanel.RecentUsed[BGM][0],
-      libraryIdSet: assets.BGMsLibraryIdSet,
-    };
-  }
-  return {
-    assets: assets.SEs,
-    recentUsedAssets: editorPanel.RecentUsed[SE][0],
-    libraryIdSet: assets.SEsLibraryIdSet,
-  };
-})
+@connect(({ assets, libraries, editorPanel }) => ({
+  BGMs: assets.BGMs,
+  SEs: assets.SEs,
+  libraries: libraries.list,
+  recentUsedBGM: editorPanel.RecentUsed[BGM][0],
+  recentUsedSE: editorPanel.RecentUsed[SE][0],
+}))
 
 export default class AudioAttributesForm extends React.Component {
   static propTypes = {
-    assets: PropTypes.array.isRequired,
-    recentUsedAssets: PropTypes.array.isRequired,
+    BGMs: PropTypes.array.isRequired,
+    SEs: PropTypes.array.isRequired,
     attributesDefList: PropTypes.array.isRequired,
-    libraryIdSet: PropTypes.object.isRequired,
     block: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired,
+    libraries: PropTypes.array,
+    recentUsedBGM: PropTypes.object,
+    recentUsedSE: PropTypes.object,
+  }
+
+  getAssetType = () => this.props.block.macroName;
+
+  getAudioAssetsList() {
+    const { BGMs, SEs } = this.props;
+    return this.isBGM() ? BGMs : SEs;
   }
 
   handleAudioSelect = (asset, attributeName) => {
@@ -77,31 +71,30 @@ export default class AudioAttributesForm extends React.Component {
   }
 
   handleOnClickAudioSelection = (audios, selectedAudio, attributeName) => {
-    const { dispatch, t, assets, block, libraryIdSet, recentUsedAssets } = this.props;
+    const { t, recentUsedBGM, recentUsedSE } = this.props;
     if (this.audioPlayer) {
       this.audioPlayer.pauseAudio();
     }
-
-    const title = t(isBGM(block) ?
-      'audioSelectionModal.title.chooseMusic' :
-      'audioSelectionModal.title.chooseSound'
-    );
-
-    dispatch(openAudioSelectionModal({
+    const title = t(`${this.isBGM() ? 'audioSelectionModal.title.chooseMusic' : 'audioSelectionModal.title.chooseSound'}`);
+    const recentUsedAsset = this.isBGM() ? recentUsedBGM : recentUsedSE;
+    this.props.dispatch(openAudioSelectionModal({
       audios,
-      recentUsedAssets,
+      recentUsedAsset,
       selectedAudio,
       title,
-      assetLibraryIds: [...libraryIdSet],
       className: SELECTION_MODAL_CONSTANT.AUDIO,
       width: 600,
       onSelected: value => this.handleAudioSelect(value, attributeName),
     }));
   }
 
+  isBGM() {
+    return this.getAssetType() === 'bgm';
+  }
+
   renderAudioInput(index, attributeDef) {
-    const { assets, block, t } = this.props;
-    const assetType = getAssetType(block);
+    const { block, t } = this.props;
+    const assetType = this.getAssetType();
     const attributeName = attributeDef.name; // "storage"
 
     let attributeLabel = t(`${assetType}.${attributeName}`);
@@ -115,7 +108,8 @@ export default class AudioAttributesForm extends React.Component {
     const selectedAudioAssetName = attribute.asset ? attribute.asset.nameEn : '';
     const selectedAudioAssetUrl = attribute.asset ? getAudioMp4Url(attribute.asset) : '';
 
-    const dropdownPlaceholder = isBGM(block) ?
+    const audioList = this.getAudioAssetsList();
+    const dropdownPlaceholder = this.isBGM() ?
       t('audioSelectionModal.placeholder.music') :
       t('audioSelectionModal.placeholder.sound');
 
@@ -137,7 +131,7 @@ export default class AudioAttributesForm extends React.Component {
           staticLabel={selectedAudioAssetName || dropdownPlaceholder}
           fullWidth
           onClick={() => this.handleOnClickAudioSelection(
-            assets,
+            audioList,
             attribute.asset,
             attributeName
           )}

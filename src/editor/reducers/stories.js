@@ -5,7 +5,9 @@ import _pull from 'lodash/pull';
 import _union from 'lodash/union';
 
 import {
+  DELETED_STORY,
   FETCH_CHARACTER,
+  UPDATED_STORY,
 } from 'editor/constants/actionTypes';
 
 import { actions as StorySettingModalActions } from 'editor/components/EditorPanel/StorySettingModal';
