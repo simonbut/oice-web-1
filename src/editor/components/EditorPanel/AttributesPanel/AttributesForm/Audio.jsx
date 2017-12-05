@@ -53,7 +53,7 @@ export default class AudioAttributesForm extends React.Component {
     assets: PropTypes.array.isRequired,
     recentUsedAssets: PropTypes.array.isRequired,
     attributesDefList: PropTypes.array.isRequired,
-    libraryIdSet: PropTypes.instanceOf(Set).isRequired,
+    libraryIdSet: PropTypes.object.isRequired,
     block: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired,
