@@ -63,10 +63,27 @@ if (DEBUG) {
   }));
 }
 
+const WHITE_LIST_SCRIPT_SRC = [
+  'app.link',
+  'cdn.branch.io cdnjs.cloudflare.com',
+  'cloud.oice.com',
+  'connect.facebook.net',
+  'geoip-db.com',
+  'js.intercomcdn.com',
+  'oicetest.glorychronicle.com',
+  'use.typekit.net',
+  'widget.intercom.io',
+  'www.facebook.com',
+  'www.google-analytics.com',
+  'www.googletagmanager.com',
+  'www.gstatic.com',
+];
+
 server.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Security-Policy', `script-src 'self' ${WHITE_LIST_SCRIPT_SRC.join(' ')}`);
   next();
 });
 

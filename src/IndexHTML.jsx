@@ -85,13 +85,13 @@ export default class IndexHTML extends React.Component {
           <script src="https://www.google-analytics.com/analytics.js" async />
           <script src={`/static/vendor/autotrack.js?v=${VERSION}`} async />
           <script src="/static/vendor/riveted-0.6.1.min.js" />
-          <script>riveted.init();</script>
           <script src={`/static/vendor/gtm.js?v=${VERSION}`} />
           <script src={`/static/vendor/branch-deepview.js?v=${VERSION}`} />
           <script src={`/static/vendor/intercom.js?v=${VERSION}`} />
           {/* Typekit */}
           <script src="https://use.typekit.net/lds7dmt.js" />
-          <script dangerouslySetInnerHTML={{ __html: 'try{Typekit.load({ async: true });}catch(e){}' }} />
+
+          <script src={`/static/js/header-script.js?v=${VERSION}`} />
         </head>
         <body>
           <noscript>
